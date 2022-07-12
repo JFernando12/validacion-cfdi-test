@@ -52,12 +52,13 @@ const start = async () => {
           throw "Este comprobante no se encuentra registrado";
         }
         if(imprimirButton) {
-          i = 10
           console.log("Captcha descrifrado");
+          break;
         }
         if(i > 8 && !imprimirButton) {
           throw "El chaptcha no se logró decrifrar";
         }
+        console.log("Intento fallido de captcha..")
       };
       // @ts-ignore
       await page._client.send("Page.setDownloadBehavior", {
