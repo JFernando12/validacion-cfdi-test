@@ -41,20 +41,20 @@ export default class Captcha {
     async getTextImageCaptcha(captchaImage: { imagen: string }): Promise<{ captchaTexto: string; captchaId: string }> {
         //DEATH BY CAPTCHA
         const data = JSON.stringify(captchaImage);
-        console.log('JSON:', data);
+        // console.log('JSON:', data);
         const reCaptcha = new DeadByCaptchaAPI_images(DEAD_BY_CAPTCHA_USER, DEAD_BY_CAPTCHA_PASSWORD);
         console.log('--> Decodificando CAPTCHA...');
         const response = await new Promise((resolve: (captcha: any) => void, reject: () => void) => {
             console.log('reCaptcha call: ');
             reCaptcha.decode(captchaImage.imagen, (captcha: () => any) => {
-                console.log('reCaptcha resolve: ', captcha);
+                // console.log('reCaptcha resolve: ', captcha);
                 if (captcha) {
                     // Report an incorrectly solved CAPTCHA.
                     // Make sure the CAPTCHA was in fact incorrectly solved!
                     //reCaptcha.report(captcha['captcha'], (result) => {
                     //    console.log('Report status: ' + result);
                     //});
-                    console.log(captcha);
+                    // console.log(captcha);
                     resolve(captcha);
                 } else {
                     console.log('reCaptcha no found: ', captcha);
@@ -63,7 +63,7 @@ export default class Captcha {
             });
         })
             .then((resPromise: any) => {
-                console.log('REQUEST CAPTCHA:', resPromise);
+                // console.log('REQUEST CAPTCHA:', resPromise);
                 try {
                     const obj = resPromise; //JSON.parse(resPromise);
                     return obj;

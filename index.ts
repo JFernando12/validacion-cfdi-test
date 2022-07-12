@@ -9,20 +9,25 @@ const info = {
       cfdi: "9bfbac1d-c5a8-4601-92d0-fbc7279ff2df",
       emisor: "ROL190620IF5",
       receptor: "NME610911L71",
+    },
+    {
+      cfdi: "9bfbac1d-c5a8-4601-92d0-fbc7279ff2df",
+      emisor: "ROL190620IT5",
+      receptor: "NME610911L71",
     }
   ],
 };
 
 const start = async () => {
-  const puppeteerConfig: LaunchOptions = await PuppeteerConst(true);
+  const puppeteerConfig: LaunchOptions = await PuppeteerConst(false);
 
   const browser: Browser = await launch(puppeteerConfig);
   const page: Page = await browser.newPage();
 
-  await page.goto("https://verificacfdi.facturaelectronica.sat.gob.mx/");
 
   for (const item of info.data) {
     try {
+      await page.goto("https://verificacfdi.facturaelectronica.sat.gob.mx/");
       await page.type("#ctl00_MainContent_TxtUUID", item.cfdi);
       await page.type("#ctl00_MainContent_TxtRfcEmisor", item.emisor);
       await page.type("#ctl00_MainContent_TxtRfcReceptor", item.receptor);
@@ -43,8 +48,12 @@ const start = async () => {
         console.log("ciclo: ", i);
         //Comprobando si es correcto el captcha
         const imprimirButton = await page.$("#BtnImprimir");
+        const noResultados = await page.$("#ctl00_MainContent_PnlNoResultados");
+        if(noResultados) {
+          throw "Este comprobante no se encuentra registrado";
+        }
         if(i === 4 && !imprimirButton) {
-          throw "Los datos son incorrecto"
+          throw "El chaptcha no se logró decrifrar";
         }
         if(imprimirButton) {
           i = 5
@@ -55,8 +64,9 @@ const start = async () => {
         behavior: "allow",
         downloadPath: `${path.resolve(__dirname, "temp")}`,
       });
-      await page.waitForTimeout(6000);
+      await page.waitForTimeout(3000);
       await page.pdf({path: item.cfdi + '.pdf', format: 'A4', printBackground: true});
+      await page.waitForTimeout(3000);
     } catch (error) {
       console.log(error);
     }
