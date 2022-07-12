@@ -12,14 +12,14 @@ const info = {
     },
     {
       cfdi: "9bfbac1d-c5a8-4601-92d0-fbc7279ff2df",
-      emisor: "ROL190620IT5",
+      emisor: "ROL190620IF5",
       receptor: "NME610911L71",
     }
   ],
 };
 
 const start = async () => {
-  const puppeteerConfig: LaunchOptions = await PuppeteerConst(false);
+  const puppeteerConfig: LaunchOptions = await PuppeteerConst(true);
 
   const browser: Browser = await launch(puppeteerConfig);
   const page: Page = await browser.newPage();
@@ -28,6 +28,7 @@ const start = async () => {
   for (const item of info.data) {
     try {
       await page.goto("https://verificacfdi.facturaelectronica.sat.gob.mx/");
+      await page.waitForTimeout(3000);
       await page.type("#ctl00_MainContent_TxtUUID", item.cfdi);
       await page.type("#ctl00_MainContent_TxtRfcEmisor", item.emisor);
       await page.type("#ctl00_MainContent_TxtRfcReceptor", item.receptor);
@@ -37,27 +38,32 @@ const start = async () => {
       );
       const fetchCaptcha = await fetch(urlImageCaptcha);
       const bufferCaptcha = await fetchCaptcha.buffer();
-      console.log(bufferCaptcha);
+
       const captchaResolver = new Captcha("cpa/facreview/validate/cfdi");
-      for (let i=0; i < 5; i ++) {
+      let i = 0;
+      for (i=0; i < 10; i ++) {
         const captchaResponse = await captchaResolver.getTextImageCaptcha( { imagen: `${bufferCaptcha.toString('base64')}` } );
         await page.type("#ctl00_MainContent_TxtCaptchaNumbers", captchaResponse.captchaTexto);
         await page.waitForTimeout(2000);
         await page.click("#ctl00_MainContent_BtnBusqueda");
         await page.waitForTimeout(2000);
         console.log("ciclo: ", i);
+
         //Comprobando si es correcto el captcha
         const imprimirButton = await page.$("#BtnImprimir");
         const noResultados = await page.$("#ctl00_MainContent_PnlNoResultados");
+
         if(noResultados) {
           throw "Este comprobante no se encuentra registrado";
         }
-        if(i === 4 && !imprimirButton) {
+        if(imprimirButton) {
+          i = 10
+          console.log("Captcha descrifrado");
+        }
+        if(i > 8) {
           throw "El chaptcha no se logró decrifrar";
         }
-        if(imprimirButton) {
-          i = 5
-        }
+        console.log("Intento fallido decrifrando captcha");
       };
       // @ts-ignore
       await page._client.send("Page.setDownloadBehavior", {
