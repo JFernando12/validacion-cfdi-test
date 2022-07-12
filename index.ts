@@ -9,11 +9,6 @@ const info = {
       cfdi: "9bfbac1d-c5a8-4601-92d0-fbc7279ff2df",
       emisor: "ROL190620IF5",
       receptor: "NME610911L71",
-    },
-    {
-      cfdi: "9bfbac1d-c5a8-4601-92d0-fbc7279ff2df",
-      emisor: "ROL190620IF5",
-      receptor: "NME610911L71",
     }
   ],
 };
