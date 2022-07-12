@@ -9,11 +9,6 @@ const info = {
       cfdi: "9bfbac1d-c5a8-4601-92d0-fbc7279ff2df",
       emisor: "ROL190620IF5",
       receptor: "NME610911L71",
-    },
-    {
-      cfdi: "9bfbac1d-c5a8-4601-92d0-fbc7279ff2df",
-      emisor: "ROL190620IF5",
-      receptor: "NME610911L71",
     }
   ],
 };
@@ -60,10 +55,9 @@ const start = async () => {
           i = 10
           console.log("Captcha descrifrado");
         }
-        if(i > 8) {
+        if(i > 8 && !imprimirButton) {
           throw "El chaptcha no se logró decrifrar";
         }
-        console.log("Intento fallido decrifrando captcha");
       };
       // @ts-ignore
       await page._client.send("Page.setDownloadBehavior", {
